@@ -1,0 +1,17 @@
+# depslib dependency file v1.0
+1385601251 source:/home/william/Documents/Code Blocks Projects/Lab-Progra3-Tablero/Personaje.cpp
+	"Personaje.h"
+
+1385507786 /home/william/Documents/Code Blocks Projects/Lab-Progra3-Tablero/Personaje.h
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+	"SDL/SDL_ttf.h"
+	<string>
+
+1385682233 source:/home/william/Documents/Code Blocks Projects/Lab-Progra3-Tablero/main.cpp
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+	"SDL/SDL_ttf.h"
+	<string>
+	"Personaje.h"
+

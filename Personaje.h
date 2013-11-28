@@ -14,10 +14,15 @@ class Personaje
         SDL_Surface*imagen;
         SDL_Surface*hp;
         int vida;
+        int atq;
+        bool turn;
         string life;
+        string toString(int num);
         TTF_Font *font = NULL;
-        SDL_Color textColor = { 0, 0, 0 };
+        SDL_Color textColor ={0,0,255,0};
         Personaje(int x,int y,SDL_Surface*personaje);
+        void atacar(Personaje*p);
+
         void dibujar(SDL_Surface *screen);
         void hp_dibujar(SDL_Surface*screen);
         virtual ~Personaje();

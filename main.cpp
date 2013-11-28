@@ -14,6 +14,7 @@ const int SCREEN_WIDTH = 675;
 const int SCREEN_HEIGHT = 675;
 const int SCREEN_BPP = 32;
 
+
 //The surfaces
 SDL_Surface *background = NULL;
 SDL_Surface *upMessage = NULL;
@@ -22,6 +23,8 @@ SDL_Surface *leftMessage = NULL;
 SDL_Surface *rightMessage = NULL;
 SDL_Surface *message = NULL;
 SDL_Surface *screen = NULL;
+bool turno=true;
+
 
 
 //The event structure
@@ -84,12 +87,12 @@ bool init()
 bool load_files()
 {
     //Load the background image
-    background = load_image( "background.png" );
+    background = load_image( "back1.png" );
 
 
 
     //Open the font
-    font = TTF_OpenFont( "lazy.ttf", 72 );
+    font = TTF_OpenFont( "imagine_font.ttf", 10);
 
     //If there was a problem in loading the background
     if( background == NULL )
@@ -263,11 +266,10 @@ int main( int argc, char* args[] )
 
 
 
-    SDL_Surface* pasillo = load_image("tablero/pasillo.png");
-    SDL_Surface* muro = load_image("tablero/muro.png");
-    SDL_Surface* cursor = load_image("tablero/cursor.png");
-    SDL_Surface* obstaculo = load_image("tablero/obstaculo.png");
-    SDL_Surface* ventaja = load_image("tablero/ventaja.png");
+    SDL_Surface* pasillo = load_image("tablero/path.png");
+    SDL_Surface* muro = load_image("tablero/brick.png");
+    SDL_Surface* obstaculo = load_image("tablero/green.png");
+    SDL_Surface* ventaja = load_image("tablero/adv.png");
 
     char tablero[9][9]={{' ','#',' ','O','V',' ','#',' ','O'},
                         {' ','#',' ','#',' ',' ','#',' ','O'},
@@ -293,14 +295,18 @@ int main( int argc, char* args[] )
 
     SDL_Surface* pasos_surface = load_image("pasos.png");
     SDL_Surface* atq_surface = load_image("ataque.png");
+    SDL_Surface* win_surface = load_image("win.png");
+    SDL_Surface* go_surface = load_image("go.png");
 
-    SDL_Surface* personaje_surface = load_image("personaje.png");
+    SDL_Surface* personaje_surface = load_image("player1/image1.png");
      SDL_Surface* enemigo_surface = load_image("enem.png");
-    Personaje personaje(2,3,personaje_surface);
+    Personaje* personaje= new Personaje(2,3,personaje_surface);
 
-    Personaje enemigo(5,5,enemigo_surface);
+    Personaje* enemigo=new Personaje(5,5,enemigo_surface);
 
+    Personaje* actual=personaje;
 
+//    enemigo.turn=false;
 
 
     SDL_Surface* cursor_surface = load_image("cursor.png");
@@ -320,8 +326,17 @@ int main( int argc, char* args[] )
                 switch( event.key.keysym.sym )
                 {
                     case SDLK_UP:
-
                         cursor_y--;
+//
+//                        limpiar(tablero_de_pasos);
+//                        if(cursor_x==personaje->x && cursor_y==personaje->y)
+//                        {
+//
+//                            marcar_atq(tablero,tablero_de_pasos,personaje->x,personaje->y,3);
+//
+//                            marcar(tablero,tablero_de_pasos,personaje->x,personaje->y,2);
+//                        }
+
                     break;
                     case SDLK_DOWN:
 
@@ -335,33 +350,76 @@ int main( int argc, char* args[] )
 
                         cursor_x++;
                     break;
+
+                    case SDLK_F1:
+
+//                        personaje->atacar(enemigo);
+//                        enemigo->attacar(personaje);
+
+                        if(actual->x==personaje->x &&  actual->y==personaje->y){
+                            enemigo->atacar(personaje);
+
+                        }
+                        if(actual->x==enemigo->x &&  actual->y==enemigo->y)
+                            personaje->atacar(enemigo);
+
+
+                    break;
+
                     case SDLK_RETURN:
-                        if(puedoLLegar(tablero,personaje.x,personaje.y,2,cursor_x,cursor_y))
+                       if(turno){
+
+                        if(puedoLLegar(tablero,personaje->x,personaje->y,2,cursor_x,cursor_y))
                         {
-                            personaje.x=cursor_x;
-                            personaje.y=cursor_y;
+                            actual = personaje;
+
+                            personaje->x=cursor_x;
+                            personaje->y=cursor_y;
+
+
+
+
+                            limpiar(tablero_de_pasos);
+
+                            marcar_atq(tablero,tablero_de_pasos,personaje->x,personaje->y,3);
+
+                            marcar(tablero,tablero_de_pasos,personaje->x,personaje->y,2);
+
+
+
+
+                        }
+
+                        turno=false;
+                        }
+
+
+
+                        else if(turno==false){
+
+                         if(puedoLLegar(tablero,enemigo->x,enemigo->y,2,cursor_x,cursor_y))
+                        {
+
+                            actual=enemigo;
+
+                            enemigo->x=cursor_x;
+                            enemigo->y=cursor_y;
 
                             limpiar(tablero_de_pasos);
 
 
+                            marcar_atq(tablero,tablero_de_pasos,enemigo->x,enemigo->y,3);
+                            marcar(tablero,tablero_de_pasos,enemigo->x,enemigo->y,2);
 
-                           marcar_atq(tablero,tablero_de_pasos,personaje.x,personaje.y,3);
-                            marcar(tablero,tablero_de_pasos,personaje.x,personaje.y,2);
+
+
+
 
                         }
-//
-//                         if(puedoLLegar(tablero,enemigo.x,enemigo.y,2,cursor_x,cursor_y))
-//                        {
-//                            enemigo.x=cursor_x;
-//                            enemigo.y=cursor_y;
-//
-//                            limpiar(tablero_de_pasos);
-//
-//
-//                           marcar_atq(tablero,tablero_de_pasos,enemigo.x,enemigo.y,3);
-//                            marcar(tablero,tablero_de_pasos,enemigo.x,enemigo.y,2);
-//
-//                        }
+
+                        turno =true;
+
+                        }
 
 
 
@@ -378,7 +436,7 @@ int main( int argc, char* args[] )
         }
 
         //Apply the background
-        apply_surface( 0, 0, background, screen );
+       apply_surface( 0, 0, background, screen );
 
         //If a message needs to be displayed
         if( message != NULL )
@@ -413,19 +471,29 @@ int main( int argc, char* args[] )
 
                 if(tablero_de_pasos[y][x]=='A')
                     apply_surface(x*75,y*75,atq_surface,screen);
+
+
             }
 
 
+        personaje->hp=TTF_RenderText_Solid( personaje->font, personaje->toString(personaje->vida).c_str(), personaje->textColor );
+        enemigo->hp=TTF_RenderText_Solid( enemigo->font, enemigo->toString(enemigo->vida).c_str(), enemigo->textColor );
+
+        personaje->dibujar(screen);
+      //  personaje->hp_dibujar(screen);
 
 
-        personaje.dibujar(screen);
-        personaje.hp_dibujar(screen);
-
-
-        enemigo.dibujar(screen);
-        enemigo.hp_dibujar(screen);
+        enemigo->dibujar(screen);
+        //enemigo->hp_dibujar(screen);
 
         apply_surface(cursor_x*75,cursor_y*75,cursor_surface,screen);
+
+
+        if(personaje->vida==0)
+            apply_surface(0,0,go_surface,screen);
+
+        if(enemigo->vida==0)
+            apply_surface(0,0,win_surface,screen);
 
         //Update the screen
         if( SDL_Flip( screen ) == -1 )
